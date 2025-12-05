@@ -163,7 +163,7 @@ End: Patient is notified that prescription is fulfilled.
 
 
 
-# 🗂 Phase 3: Logical Model Design for Pharmacy Management System
+#  Phase 3: Logical Model Design for Pharmacy Management System
 
 ##  What This Phase Covers
 This phase focuses on designing a detailed and robust logical data model for the pharmacy management system. The goal is to create a structure that accurately represents entities, their attributes, and relationships while ensuring the design can handle real-world pharmacy data scenarios.
@@ -282,7 +282,7 @@ This logical model provides a solid foundation for developing a reliable and eff
 - **Password:** pascal  
 - Created in **Oracle 19c** using **SQL Developer**  
 
-### 📈 Monitoring
+###  Monitoring
 
 - **Oracle Enterprise Manager (OEM)** was used to monitor performance and activity.  
 - Snapshots and performance dashboards help track real-time resource use and activity logs.
