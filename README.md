@@ -1,11 +1,17 @@
 Pharmacy Management System – PL/SQL Oracle Database Project
 
 Student Info
+
 Name: Uwitonze pacific
+
 Student ID: 26983
+
 Course: Database Development with PL/SQL (INSY 8311)
+
 Lecturer: Eric Maniraguha
+
 Academic Year: 2025–2026
+
 Introduction:
 
 Modern pharmacies face increasing challenges due to manual processes that often result in prescription errors, inventory mismatches, delayed patient services, and data inconsistencies.
