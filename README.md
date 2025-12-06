@@ -441,11 +441,45 @@ END pharmacy_pkg;
 
 | Feature | Description |
 |---------|-------------|
-| **Stored Procedures** | Issue prescriptions, process payments |
-| **Functions** | Calculate totals, fetch prescription details |
+| **Stored Procedures** | Issue prescriptions, process payments, generate reports |
+| **Functions** | Calculate totals, fetch prescription details, rankings |
 | **Cursors** | Iterate through prescriptions and inventory |
 | **Exception Handling** | Handle duplicates, invalid inputs, stock issues |
 | **Packages** | Group related business logic (billing, inventory) |
+| **Window Functions** | ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, PARTITION BY |
+
+### Window Functions Implemented (Phase VI Requirement)
+
+The system includes comprehensive window function examples:
+
+**1. ROW_NUMBER()** - Sequential numbering of prescriptions per patient
+```sql
+ROW_NUMBER() OVER (PARTITION BY patient_id ORDER BY issue_date DESC)
+```
+
+**2. RANK() & DENSE_RANK()** - Ranking doctors by prescription count
+```sql
+RANK() OVER (ORDER BY COUNT(prescription_id) DESC)
+DENSE_RANK() OVER (PARTITION BY category ORDER BY revenue DESC)
+```
+
+**3. LAG() & LEAD()** - Compare current/previous inventory transactions
+```sql
+LAG(quantity, 1) OVER (PARTITION BY medicine_id ORDER BY date)
+LEAD(amount) OVER (ORDER BY payment_date)
+```
+
+**4. Aggregates with OVER** - Running totals and moving averages
+```sql
+SUM(amount) OVER (ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)
+```
+
+**5. NTILE()** - Categorize medicines into quartiles
+**6. PERCENT_RANK()** - Percentile ranking of pharmacists
+**7. RATIO_TO_REPORT()** - Calculate percentage of total revenue
+
+See [queries/window_functions.sql](queries/window_functions.sql) for 14 complete examples.
 
 ---
 
@@ -508,8 +542,41 @@ END;
 | Feature | Purpose |
 |---------|---------|
 | **Auto Stock Update** | Trigger deducts inventory on dispensing |
-| **Weekday/Holiday Restriction** | Blocks certain operations during restricted times |
-| **Audit Logging** | Tracks all data modifications |
+| **Weekday/Holiday Restriction** | Blocks INSERT/UPDATE/DELETE on weekdays (Mon-Fri) and holidays |
+| **Audit Logging** | Tracks all data modifications with ALLOWED/DENIED status |
+| **Expired Medicine Prevention** | Blocks dispensing of expired medications |
+| **Low Stock Alerts** | Automatic alerts when inventory falls below threshold |
+
+### Weekday/Holiday Restriction (Phase VII Critical Requirement)
+
+**Business Rule:** Employees CANNOT perform INSERT/UPDATE/DELETE operations:
+- On **WEEKDAYS** (Monday-Friday)
+- On **PUBLIC HOLIDAYS** (upcoming month)
+
+**Implementation:**
+1. **Holiday Table:** Stores public holidays with date and recurrence info
+2. **Restriction Function:** `is_restricted_time()` checks current day and holiday status
+3. **Audit Logging Function:** `log_restriction_attempt()` records all attempts
+4. **Restriction Triggers:**
+   - `trg_restrict_prescription` - Blocks prescription modifications
+   - `trg_restrict_payment` - Blocks payment modifications
+
+**Trigger Logic:**
+```sql
+-- Block if WEEKDAY (Mon-Fri)
+IF v_day IN ('MON', 'TUE', 'WED', 'THU', 'FRI') THEN
+    -- Log DENIED and raise error
+    RAISE_APPLICATION_ERROR(-20010, 'Operations not allowed on weekdays');
+END IF;
+
+-- Block if PUBLIC HOLIDAY
+IF v_is_holiday > 0 THEN
+    -- Log DENIED and raise error
+    RAISE_APPLICATION_ERROR(-20011, 'Operations not allowed on holidays');
+END IF;
+
+-- Otherwise ALLOW (Weekend, non-holiday)
+```
 
 ### Audit Table Structure
 
@@ -519,9 +586,9 @@ END;
 | `Action_Date` | Timestamp of action |
 | `Operation` | INSERT/UPDATE/DELETE |
 | `Table_Name` | Affected table |
-| `Status` | ALLOWED/DENIED |
+| `Status` | **ALLOWED** or **DENIED** |
 | `Old_Value` | Previous data |
-| `New_Value` | Updated data |
+| `New_Value` | Updated data / Denial reason |
 
 ### Audit Screenshot
 
@@ -577,16 +644,37 @@ ORDER BY total_revenue DESC;
 ### Repository Contents
 
 ```
-pharmacy-management-system/
-├── sql/
-│   ├── ddl/          # Table creation scripts
-│   ├── dml/          # Data insertion scripts
-│   ├── triggers/     # Trigger definitions
-│   ├── procedures/   # Stored procedures
-│   └── packages/     # PL/SQL packages
-├── screenshots/      # OEM and query screenshots
-├── docs/            # Additional documentation
-└── README.md        # This file
+mon_26983_pacific_uwitonze_pharmacy_management_system_db/
+├── database/
+│   ├── scripts/
+│   │   ├── 00_setup_pdb_simple.sql      # PDB creation script
+│   │   ├── 01_create_tables.sql         # DDL: Tables, sequences, indexes (incl. holiday table)
+│   │   ├── 02_insert_data.sql           # DML: Basic sample data
+│   │   ├── 02_insert_data_expanded.sql  # DML: 100-500 rows per table
+│   │   ├── 02_insert_holidays.sql       # Holiday data for restrictions
+│   │   ├── 03_procedures.sql            # Packages, procedures, functions (incl. window functions)
+│   │   ├── 04_triggers.sql              # Database triggers (incl. weekday/holiday restriction)
+│   │   └── 05_test_restrictions.sql     # Test script for Phase VII requirements
+│   └── documentation/
+│       └── README.md                    # Database setup guide
+├── documentation/
+│   ├── data_dictionary.md               # Complete data dictionary
+│   ├── architecture.md                  # System architecture
+│   ├── design_decisions.md              # Design rationale
+│   └── erd_diagram.md                   # ERD diagrams (Mermaid & ASCII)
+├── business_intelligence/
+│   ├── bi_requirements.md               # BI requirements specification
+│   ├── dashboards.md                    # Dashboard designs & SQL
+│   └── kpi_definitions.md               # KPI definitions & formulas
+├── queries/
+│   ├── data_retrieval.sql               # Operational queries
+│   ├── analytics_queries.sql            # Business analytics queries
+│   ├── audit_queries.sql                # Security & compliance queries
+│   └── window_functions.sql             # Window function examples (Phase VI)
+├── screenshots/
+│   ├── README.md                        # Screenshot checklist (38 items)
+│   └── screenshot_queries.sql           # Queries for taking screenshots
+└── README.md                            # This file
 ```
 
 ---
