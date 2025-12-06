@@ -625,7 +625,7 @@ This project showcases the power of **PL/SQL programming** combined with thought
 | Platform | Contact |
 |----------|---------|
 | Email | pacific.uwitonze112@gmail.com |
-| GitHub | [View Repository](https://github.com/pacific-uwitonze) |
+
 
 ---
 
