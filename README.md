@@ -325,9 +325,12 @@ Oracle Enterprise Manager (OEM) was configured for:
 
 ### Screenshots
 
-![PDB Creation](https://github.com/user-attachments/assets/cf5590ec-edaf-446c-a501-df076f67469e)
+![WhatsApp Image 2025-12-06 at 13 07 53_56733edb](https://github.com/user-attachments/assets/2ece5d75-c5de-4617-9fcd-3d1c38f219aa)
 
-![OEM Dashboard](https://github.com/user-attachments/assets/a7412f94-637f-4942-8ce5-ad4faf993d62)
+
+![oem_dashboard](https://github.com/user-attachments/assets/aa8ce64b-3607-4c9a-9bd8-cbcfc554f590)
+
+
 
 ---
 
